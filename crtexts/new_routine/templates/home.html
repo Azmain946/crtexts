@@ -1,0 +1,223 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Routine Selector</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #ffffff;
+            text-align: center;
+        }
+
+        .logo {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .logo h1 {
+            font-size: 48px;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            top: 20px;
+        }
+
+        .logo .pencil {
+            position: absolute;
+            right: -30px;
+            top: -10px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .dropdown-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #9D4EDD;
+            background: transparent;
+            color: #7a7a7a;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            padding-left: 15px;
+            font-weight: 600;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            background: linear-gradient(45deg, #0038FF, #C92EFF);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(45deg, #001FCC, #A025CC);
+        }
+
+        .submit-btn:active {
+            background: linear-gradient(45deg, #000E99, #851D99);
+        }
+
+        .error-message {
+            color: red;
+            font-size: 16px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <svg class="pencil" width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 19L21 10L14 3L5 12L3 21L12 19Z" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1>Co <span style="color:#007bff">CR</span></h1>
+    </div>
+
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <div class="button-group">
+                <select id="institute" class="dropdown-btn">
+                    <option value="">Select Institute</option>
+                    {% for institute in institutes %}
+                        <option value="{{ institute.id }}">{{ institute.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="department" class="dropdown-btn">
+                    <option value="">Select Department</option>
+                </select>
+
+                <select id="batch" class="dropdown-btn">
+                    <option value="">Select Batch</option>
+                </select>
+
+                <select id="section" class="dropdown-btn">
+                    <option value="">Select Section</option>
+                </select>
+            </div>
+
+            <button class="submit-btn">GET ROUTINE</button>
+            <div id="error-message" class="error-message">Please select all fields before proceeding!</div>
+        </div>
+    </div>
+
+    <script>
+        // Function to check if all fields are selected
+        function checkFields() {
+            const institute = document.getElementById('institute').value;
+            const department = document.getElementById('department').value;
+            const batch = document.getElementById('batch').value;
+            const section = document.getElementById('section').value;
+            const errorMessage = document.getElementById('error-message');
+
+            // Show or hide the error message
+            if (!institute || !department || !batch || !section) {
+                errorMessage.style.display = 'block';
+                return false; // Prevent form submission or page redirection
+            } else {
+                errorMessage.style.display = 'none';
+                return true; // Allow form submission or page redirection
+            }
+        }
+
+        // Event listeners to check fields on change
+        document.getElementById('institute').addEventListener('change', function() {
+            const instituteId = this.value;
+            fetch(`/ajax/load-departments/?institute_id=${instituteId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const deptSelect = document.getElementById('department');
+                    deptSelect.innerHTML = '<option value="">Select Department</option>';
+                    data.forEach(dept => {
+                        deptSelect.innerHTML += `<option value="${dept.id}">${dept.department}</option>`;
+                    });
+                    // Clear dependent dropdowns
+                    document.getElementById('batch').innerHTML = '<option value="">Select Batch</option>';
+                    document.getElementById('section').innerHTML = '<option value="">Select Section</option>';
+                    checkFields();
+                });
+        });
+
+        document.getElementById('department').addEventListener('change', function() {
+            const instituteId = document.getElementById('institute').value;
+            const departmentId = this.value;
+            fetch(`/ajax/load-batches/?institute_id=${instituteId}&department_id=${departmentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const batchSelect = document.getElementById('batch');
+                    batchSelect.innerHTML = '<option value="">Select Batch</option>';
+                    data.forEach(batch => {
+                        batchSelect.innerHTML += `<option value="${batch.id}">${batch.batch}</option>`;
+                    });
+                    // Clear dependent section dropdown
+                    document.getElementById('section').innerHTML = '<option value="">Select Section</option>';
+                    checkFields();
+                });
+        });
+
+        document.getElementById('batch').addEventListener('change', function() {
+            const instituteId = document.getElementById('institute').value;
+            const departmentId = document.getElementById('department').value;
+            const batchId = this.value;
+            fetch(`/ajax/load-sections/?institute_id=${instituteId}&department_id=${departmentId}&batch_id=${batchId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const sectionSelect = document.getElementById('section');
+                    sectionSelect.innerHTML = '<option value="">Select Section</option>';
+                    data.forEach(section => {
+                        sectionSelect.innerHTML += `<option value="${section.id}">${section.section}</option>`;
+                    });
+                    checkFields();
+                });
+        });
+
+        document.getElementById('section').addEventListener('change', function() {
+            checkFields();
+        });
+
+        document.querySelector('.submit-btn').addEventListener('click', function() {
+            if (checkFields()) {
+                const institute = document.getElementById('institute').selectedOptions[0]?.text.trim();
+                const department = document.getElementById('department').selectedOptions[0]?.text.trim();
+                const batch = document.getElementById('batch').selectedOptions[0]?.text.trim();
+                const section = document.getElementById('section').selectedOptions[0]?.text.trim();
+
+                // Preserve capitalization and only replace spaces with hyphens
+                const formattedInstitute = institute.replace(/\s+/g, '-');
+                const formattedDepartment = department.replace(/\s+/g, '-');
+                const formattedBatch = batch.replace(/\s+/g, '-');
+                const formattedSection = section.replace(/\s+/g, '-');
+
+                // Construct the final URL
+                const routineUrl = `/${formattedInstitute}/${formattedDepartment}/${formattedBatch}/${formattedSection}/routine/`;
+
+                // Redirect to the generated URL
+                window.location.href = routineUrl;
+            }
+        });
+    </script>
+</body>
+</html>

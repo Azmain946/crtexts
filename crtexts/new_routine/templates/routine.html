@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Mobile responsive meta tag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Class Schedule</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Fredoka', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      text-align: center;
+      color: #333;
+    }
+    /* Initially hide extra info */
+.extra-info {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+  opacity: 0;
+}
+
+/* When active, allow the container to expand and show the content */
+.extra-info.active {
+  max-height: 200px; /* Adjust as needed based on your content height */
+  opacity: 1;
+  margin-top: 10px;  /* Optional spacing */
+}
+
+    .container {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    .timer {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .box {
+      background: #fff;
+      padding: 15px;
+      width: 80px;
+      border-radius: 10px;
+      box-shadow: 2px 2px 10px rgba(169, 130, 255, 0.3);
+    }
+    .box span {
+      font-size: 24px;
+      font-weight: bold;
+      color: #8c52ff;
+    }
+    .box p {
+      margin: 0;
+      font-size: 14px;
+      font-weight: bold;
+      color: #8c52ff;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      background: #eee;
+      transition: background 0.3s, color 0.3s;
+    }
+    .tab.active {
+      background: #8c52ff;
+      color: #fff;
+    }
+    .classes {
+      max-width: 100%;
+      margin: auto;
+      text-align: left;
+      padding: 0 10px;
+    }
+    .class-card {
+      background: #f8f8f8;
+      padding: 10px;
+      border-radius: 10px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+    }
+    /* Updated date style as a circular badge */
+    .date {
+      display: inline-block;
+      background: #8c52ff;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      width: 50px;
+      height: 50px;
+      line-height: 50px;
+      border-radius: 50%;
+      text-align: center;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    .details {
+      flex-grow: 1;
+    }
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    .info {
+      font-size: 14px;
+    }
+    .hidden {
+      display: none;
+    }
+    /* Media Queries for small devices */
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 20px;
+      }
+      /* Keep timer horizontal for small devices */
+      .box {
+        width: 70px;
+        padding: 10px;
+      }
+      .box span {
+        font-size: 20px;
+      }
+      .box p {
+        font-size: 12px;
+      }
+      .tab {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+      .title {
+        font-size: 16px;
+      }
+      .info {
+        font-size: 12px;
+      }
+      .date {
+        width: 45px;
+        height: 45px;
+        line-height: 45px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Your Next Class</h2>
+
+    <!-- Timer -->
+    <div class="timer">
+
+      <div class="box">
+        <span id="hours">00</span>
+        <p>HOURS</p>
+      </div>
+      <div class="box">
+        <span id="minutes">00</span>
+        <p>MINS</p>
+      </div>
+      <div class="box">
+        <span id="seconds">00</span>
+        <p>SECS</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('class')">Class</button>
+      <button class="tab" onclick="showTab('exam')">Exam</button>
+      <button class="tab" onclick="showTab('notice')">Notice</button>
+    </div>
+
+    <!-- Content Sections -->
+    <div id="classSection" class="classes">
+      
+      {% if all_classes %}
+      <h3>All Classes ({{ today_all }})</h3>
+      {% for class in all_classes %}
+      <div class="class-card">
+        <div class="date">{{ forloop.counter }}</div>
+        <div class="details">
+          {% if class.paused %}
+          <p class="title">{{ class.course_name }} | Cancelled </p>
+          {% else %}
+          <p class="title">{{ class.course_name }}</p>
+          {% endif %}
+          
+          <p class="info">{{ class.start_time }} - {{ class.end_time_display }} | {{ class.course_teacher }}</p>
+        </div>
+      
+      </div>
+      
+      {% endfor %}
+      {% else %}
+      <h3>No upcoming classes today</h3>
+      {% endif %}
+
+    </div>
+
+    <div id="examSection" class="classes hidden">
+      {% if exams %}
+      {% for exam in exams %}
+        
+     
+      <div class="class-card">
+        <div class="date">{{ exam.ex_date }}</div>
+        <div class="details">
+          <p class="title">{{exam.exam_name}} @ {{ exam.exam_time }}</p>
+          <p class="info">Duration: {{exam.duration }} | Syllabus: {{ exam.syllabus }}</p>
+        </div>
+        
+      
+      </div>
+      {% endfor %}
+      {% else %}
+      <h3>No upcoming exams</h3>
+      {% endif %}
+      
+
+    </div>
+
+    <div id="noticeSection" class="classes hidden">
+      {% if notices %}
+        {% for notice in notices %}
+        <div class="class-card">
+            <div class="date">{{ notice.ndate }}</div>
+            <div class="details">
+              <p class="title">{{notice.title}}</p>
+              <p class="info">{{notice.notice}}</p>
+            </div>
+            
+          
+          </div>
+        {% endfor %}
+      {% else %}
+      <h3>No new notices</h3>
+      {% endif %}
+      
+    </div>
+  </div>
+
+  <script>
+    // TIMER LOGIC
+    // TIMER LOGIC
+function startTimer(targetDate) {
+  function updateTimer() {
+    let now = new Date().getTime();
+    let distance = targetDate - now;
+
+    let hours = Math.floor(distance / (1000 * 60 * 60));
+    let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("hours").innerText = hours < 10 ? '0' + hours : hours;
+    document.getElementById("minutes").innerText = minutes < 10 ? '0' + minutes : minutes;
+    document.getElementById("seconds").innerText = seconds < 10 ? '0' + seconds : seconds;
+
+    if (distance < 0) {
+      document.getElementById("hours").innerText = "00";
+      document.getElementById("minutes").innerText = "00";
+      document.getElementById("seconds").innerText = "00";
+      clearInterval(timerInterval);
+    }
+  }
+
+  let timerInterval = setInterval(updateTimer, 1000);
+  updateTimer(); // Initial call to display timer immediately
+}
+
+// Set timer to the next class (ensure `nextClassTime` is correctly formatted in Django)
+let nextClassTime = "{{ next_class_time_js }}";
+
+if (nextClassTime && nextClassTime !== "None") {
+  let targetDate = new Date(nextClassTime).getTime();
+  startTimer(targetDate);
+} else {
+    document.getElementById("hours").innerText = "00";
+    document.getElementById("minutes").innerText = "00";
+    document.getElementById("seconds").innerText = "00";
+}
+
+    // Set timer to the next class (adjust date accordingly)
+    
+
+    // TAB SWITCHING LOGIC
+    function showTab(tab) {
+      // Hide all sections
+      document.getElementById("classSection").classList.add("hidden");
+      document.getElementById("examSection").classList.add("hidden");
+      document.getElementById("noticeSection").classList.add("hidden");
+
+      // Remove active class from all buttons
+      document.querySelectorAll(".tab").forEach(button => button.classList.remove("active"));
+
+      // Show the selected tab content and set the button as active
+      if (tab === "class") {
+        document.getElementById("classSection").classList.remove("hidden");
+        document.querySelector(".tabs .tab:nth-child(1)").classList.add("active");
+      } else if (tab === "exam") {
+        document.getElementById("examSection").classList.remove("hidden");
+        document.querySelector(".tabs .tab:nth-child(2)").classList.add("active");
+      } else if (tab === "notice") {
+        document.getElementById("noticeSection").classList.remove("hidden");
+        document.querySelector(".tabs .tab:nth-child(3)").classList.add("active");
+      }
+    }
+  </script>
+
+</body>
+</html>
+

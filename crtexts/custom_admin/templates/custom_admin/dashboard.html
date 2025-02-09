@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            background-color: #8a4dff;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .section {
+            background-color: #fffbea;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border: 2px solid black;
+            border-radius: 25px;
+            padding: 10px 20px;
+            margin: 10px 0;
+        }
+
+        .card .title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .actions a {
+            margin: 0 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .add {
+            color: green;
+        }
+
+        .change {
+            color: orange;
+        }
+
+        /* Style for the "Add Class" button container */
+.add-class-actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Style for the "Add Class" button */
+.add-class-button {
+    padding: 10px 20px;
+    color: white;
+    background-color: #8a4dff; /* Match the header color */
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.add-class-button:hover {
+    background-color: #7f3de8; /* Slightly darker shade for hover */
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.add-class-button:active {
+    transform: scale(1); /* Button returns to normal size on click */
+}
+
+
+
+        @media (max-width: 600px) {
+            .header, .section {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .actions {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Site Administration</div>
+
+    <div class="section">
+        <h3>Classes</h3>
+        {% for class in classes %}
+        <div class="card">
+            <div class="title">{{ class.course_name }} | {{class.day}} | {{ class.start_time}} </div>
+            <div class="actions">
+                {% if class.paused %}
+                <a href="{% url 'cancel_class' class.id %}" class="add">▶️ Resume</a>
+                {% else %}
+                <a href="{% url 'cancel_class' class.id %}" class="add">⛔ Cancel</a>
+                {% endif %}
+                
+                <a href="{% url 'update_class' class.id %}" class="change">✏️ Change</a>
+                <a href="{% url 'delete_class' class.id %}" class="change">🗑 Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="add-class-actions">
+            <!-- This is where we apply the specific "Add Class" button styling -->
+            <a href="{% url 'add_class' %}" class="add-class-button">Add Class</a>
+        </div>
+    </div>
+    <div class="section">
+        <h3>Exams</h3>
+        {% for exam in exams %}
+        <div class="card">
+            <div class="title">{{ exam.exam_name }} | {{exam.exam_date}} | {{exam.exam_time}}</div>
+            <div class="actions">
+                
+                <a href="{% url 'update_exam' exam.id %}" class="change">✏️ Change</a>
+                <a href="{% url 'delete_exam' exam.id %}" class="change">🗑 Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="add-class-actions">
+            <!-- This is where we apply the specific "Add Class" button styling -->
+            <a href="{% url 'add_exam' %}" class="add-class-button">Add Exam</a>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Notices</h3>
+        {% for notice in notices %}
+        <div class="card">
+            <div class="title">{{ notice.title }}</div>
+            <div class="actions">
+                
+                <a href="{% url 'update_notice' notice.id %}" class="change">✏️ Change</a>
+                <a href="{% url 'delete_notice' notice.id %}" class="change">🗑 Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="add-class-actions">
+            <!-- This is where we apply the specific "Add Class" button styling -->
+            <a href="{% url 'add_notice' %}" class="add-class-button">Add Notice</a>
+        </div>
+    </div>
+
+</body>
+</html>
+
