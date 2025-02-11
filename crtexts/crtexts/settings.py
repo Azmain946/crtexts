@@ -12,16 +12,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$c!9qee%hw-85f9+$+jjz_3t87ty^(dhqh1e_111c0n8wggr@@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['crtext.pythonanywhere.com']
+ALLOWED_HOSTS = ['crtext.pythonanywhere.com',
+                 '127.0.0.1',]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django_celery_beat',
-    'celery',
     'custom_admin',
     'django.contrib.admin',
     'django.contrib.auth',

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Custom Admin Dashboard</title>
     <style>
         body {
@@ -78,6 +79,23 @@
     text-align: center;
     margin-top: 20px;
 }
+.logout-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 2px solid #007bff;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: transparent;
+    transition: all 0.3s ease-in-out;
+}
+
+.logout-btn:hover {
+    background-color: #007bff;
+    color: white;
+}
+
 
 /* Style for the "Add Class" button */
 .add-class-button {
@@ -179,6 +197,10 @@
             <a href="{% url 'add_notice' %}" class="add-class-button">Add Notice</a>
         </div>
     </div>
+    
+    <br>
+    <a href="{% url 'custom_logout' %}" class="logout-btn">Log Out</a>
+
 
 </body>
 </html>
